@@ -1,0 +1,9 @@
+<h1>Equipment Types</h1>
+<ul>
+{% for equipment_type in object_list %}
+    <li>{{ equipment_type.name }}</li>
+{% empty %}
+    <li>No articles yet.</li>
+{% endfor %}
+</ul>
+<a href="./equipment-types/add">Add new equipment type</a>

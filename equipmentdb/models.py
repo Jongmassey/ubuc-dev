@@ -1,13 +1,16 @@
 from django.db import models
 from django.db.models import constraints
 from django.contrib.auth.models import User
-
+from django.urls import reverse_lazy
 
 class UbucModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=False)
     updated_on = models.DateTimeField(auto_now=True, null=False)
     created_by = models.ForeignKey(User, null=False,blank=False,on_delete=models.RESTRICT,related_name='%(class)s_created_by')
     updated_by = models.ForeignKey(User, null=False,blank=False,on_delete=models.RESTRICT,related_name='%(class)s_updated_by')
+
+    def get_absolute_url(self):
+        return reverse_lazy("equipment-type-list")
     class Meta:
         abstract = True
 
