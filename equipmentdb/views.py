@@ -57,6 +57,7 @@ class EquipmentTypeUpdateView(UpdateView):
 class EquipmentTypeDeleteView(DeleteView):
     model = EquipmentType
     success_url = reverse_lazy("equipment-type-list")
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(EquipmentTypeDeleteView, self).dispatch(*args, **kwargs)
