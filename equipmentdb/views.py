@@ -46,12 +46,12 @@ class EquipmentTypeUpdateView(UpdateView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(EquipmentTypeCreateView, self).dispatch(*args, **kwargs)
+        return super(EquipmentTypeUpdateView, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         obj = form.save(commit=False)
         obj.updated_by = self.request.user
-        return super(EquipmentTypeCreateView, self).form_valid(form)
+        return super(EquipmentTypeUpdateView, self).form_valid(form)
 
 
 class EquipmentTypeDeleteView(DeleteView):
@@ -59,4 +59,4 @@ class EquipmentTypeDeleteView(DeleteView):
     success_url = reverse_lazy("equipment-type-list")
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(EquipmentTypeCreateView, self).dispatch(*args, **kwargs)
+        return super(EquipmentTypeDeleteView, self).dispatch(*args, **kwargs)
