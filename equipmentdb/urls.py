@@ -39,4 +39,20 @@ urlpatterns = [
         EquipmentDeleteView.as_view(),
         name="equipmentdelete",
     ),
+    path("equipment-note", EquipmentNoteListView.as_view(), name="equipment-note-list"),
+    path(
+        "equipment-note/add",
+        EquipmentNoteCreateView.as_view(),
+        name="equipment-note-add",
+    ),
+    path(
+        "equipment-note/<int:pk>",
+        EquipmentNoteUpdateView.as_view(),
+        name="equipment-note-update",
+    ),
+    path(
+        "equipment-note/<int:pk>/delete",
+        EquipmentNoteDeleteView.as_view(),
+        name="equipment-notedelete",
+    ),
 ]

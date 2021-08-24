@@ -1,0 +1,9 @@
+<h1>Equipment Notes</h1>
+<ul>
+{% for equipment_note in object_list %}
+    <li>{{ equipment_note.name }} <a href="./equipment-note/{{equipment_note.id}}">Edit</a> <a href="./equipment-note/{{equipment_note.id}}/delete">Delete</a> </li>
+{% empty %}
+    <li>No equipment notes yet.</li>
+{% endfor %}
+</ul>
+<a href="./equipment-note/add">Add new equipment note</a>
