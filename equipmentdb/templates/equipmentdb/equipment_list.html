@@ -1,0 +1,9 @@
+<h1>Equipment Items</h1>
+<ul>
+{% for equipment in object_list %}
+    <li>{{ equipment }} <a href="./equipment/{{equipment.id}}">Edit</a> <a href="./equipment/{{equipment.id}}/delete">Delete</a> </li>
+{% empty %}
+    <li>No equipment items yet.</li>
+{% endfor %}
+</ul>
+<a href="./equipment/add">Add new equipment item</a>

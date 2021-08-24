@@ -2,15 +2,21 @@ from django.db import models
 from django.db.models import constraints
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
+import re
 
+def classToURL(class_name:str)->str:
+    exp = re.compile('([a-z])([A-Z])')
+    return exp.sub(r'\1-\2',class_name).lower()
 
+#abstract base class with common auditing fields
 class UbucModel(models.Model):
-    created_on = models.DateTimeField(auto_now_add=True, null=False)
-    updated_on = models.DateTimeField(auto_now=True, null=False)
+    created_on = models.DateTimeField(auto_now_add=True, null=False,editable=False)
+    updated_on = models.DateTimeField(auto_now=True, null=False,editable=False)
     created_by = models.ForeignKey(
         User,
         null=False,
         blank=False,
+        editable=False,
         on_delete=models.RESTRICT,
         related_name="%(class)s_created_by",
     )
@@ -18,12 +24,13 @@ class UbucModel(models.Model):
         User,
         null=False,
         blank=False,
+        editable=False,
         on_delete=models.RESTRICT,
         related_name="%(class)s_updated_by",
     )
 
     def get_absolute_url(self):
-        return reverse_lazy("equipment-type-list")
+        return reverse_lazy(f'{classToURL(self.__class__.__name__)}-list')
 
     class Meta:
         abstract = True
@@ -31,6 +38,8 @@ class UbucModel(models.Model):
 
 class EquipmentType(UbucModel):
     name = models.CharField(max_length=255, null=False, blank=False)
+    def __str__(self):
+        return self.name
 
     class Meta:
         constraints = [
@@ -54,6 +63,9 @@ class Equipment(UbucModel):
                 fields=["equipment_type", "ubuc_id"], name="unique_ubuc_id"
             )
         ]
+
+    def __str__(self):
+        return f'{self.equipment_type} {self.ubuc_id}'
 
 
 class EquipmentNote(UbucModel):
