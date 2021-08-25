@@ -10,13 +10,15 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django import forms
 from django.forms import inlineformset_factory
+from django.template import loader
 
 class DateInput(forms.DateInput):
     input_type = "date"
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the equipmentdb index.")
+    template = loader.get_template('equipmentdb/index.html')
+    return HttpResponse(template.render())
 
 
 # equipment types
