@@ -1,3 +1,5 @@
+{% extends "equipmentdb/base.html" %}
+{% block content %}
 <h1>Equipment Types</h1>
 <ul>
 {% for equipment_type in object_list %}
@@ -7,3 +9,4 @@
 {% endfor %}
 </ul>
 <a href="./equipment-types/add">Add new equipment type</a>
+{% endblock content %}
