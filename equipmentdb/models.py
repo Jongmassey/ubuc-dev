@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import constraints
 from django.contrib.auth.models import User
+from django.db.models.deletion import RESTRICT
 from django.urls import reverse_lazy
 import re
 
@@ -110,3 +111,7 @@ class EquipmentTest(UbucModel):
 
 class EquipmentService(UbucModel):
     equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT)
+
+class EquipmentFault(UbucModel):
+    equipment = models.ForeignKey(Equipment,null=False,on_delete=RESTRICT)
+    notes = models.TextField(blank=False,null=False)
