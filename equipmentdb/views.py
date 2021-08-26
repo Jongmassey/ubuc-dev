@@ -106,12 +106,15 @@ class EquipmentCreateView(UbucBaseCreateView):
 class EquipmentUpdateView(UbucBaseUpdateView):
     model = Equipment
     NoteFormSet = inlineformset_factory(Equipment,EquipmentNote,fields=('notes',),extra=1)   
+    FaultFormSet = inlineformset_factory(Equipment,EquipmentFault,fields=['notes','status'],extra=1)
 
     def get_context_data(self, **kwargs):
         ctx =  super().get_context_data(**kwargs)
         equipment_item = self.get_object()
         notes = self.NoteFormSet(instance=equipment_item)
+        faults = self.FaultFormSet(instance=equipment_item)
         ctx['notes'] = notes
+        ctx['faults'] = faults
         return ctx
 
 class EquipmentDeleteView(UbucBaseDeleteView):

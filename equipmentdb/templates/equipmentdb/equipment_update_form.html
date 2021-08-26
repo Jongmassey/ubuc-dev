@@ -1,8 +1,17 @@
 {% extends "equipmentdb/base.html" %}
 {% block content %}
 <form method="POST">{% csrf_token %}
-    {{ form.as_p }}
-    {{notes.as_p}}
+    <fieldset id="equipment">
+        {{ form.as_p }}
+    </fieldset>
+    <fieldset id="notes">
+        <legend>Equipment Notes</legend>
+        {{notes.as_p}}
+    </fieldset>
+    <fieldset id="faults">
+        <legend>Equipment Faults</legend>
+        {{faults.as_p}}
+    </fieldset>
     <input type="submit" value="Update">
 </form>
 {% endblock content %}
