@@ -1,3 +1,4 @@
+from typing import Any
 from django.db.models.fields import DateField
 from equipmentdb.models import EquipmentType
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -79,6 +80,7 @@ class UbucBaseUpdateView(UpdateView):
 class UbucBaseDeleteView(DeleteView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
+        self.success_url = self.get_object().get_absolute_url()
         return super(UbucBaseDeleteView, self).dispatch(*args, **kwargs)
 
 # equipment types
@@ -93,7 +95,6 @@ class EquipmentTypeUpdateView(UbucBaseUpdateView):
 
 class EquipmentTypeDeleteView(UbucBaseDeleteView):
     model = EquipmentType
-    success_url = reverse_lazy("equipment-type-list")
 
 # equipment items
 class EquipmentListView(UbucBaseListView):
@@ -108,14 +109,13 @@ class EquipmentUpdateView(UbucBaseUpdateView):
 
     def get_context_data(self, **kwargs):
         ctx =  super().get_context_data(**kwargs)
-        eqp = self.get_object()
-        notes = self.NoteFormSet(instance=eqp)
+        equipment_item = self.get_object()
+        notes = self.NoteFormSet(instance=equipment_item)
         ctx['notes'] = notes
         return ctx
 
 class EquipmentDeleteView(UbucBaseDeleteView):
     model = Equipment
-    success_url = reverse_lazy("equipment-list")
 
 # Equipment Notes
 class EquipmentNoteListView(UbucBaseListView):
@@ -129,4 +129,3 @@ class EquipmentNoteUpdateView(UbucBaseUpdateView):
 
 class EquipmentNoteDeleteView(UbucBaseDeleteView):
     model = EquipmentNote
-    success_url = reverse_lazy("equipment-list")
