@@ -1,16 +1,17 @@
 {% extends "equipmentdb/base.html" %}
 {% block content %}
+{% load crispy_forms_tags %}
 <form method="POST">{% csrf_token %}
     <fieldset id="equipment">
-        {{ form.as_p }}
+        {{ form|crispy}}
     </fieldset>
     <fieldset id="notes">
         <legend>Equipment Notes</legend>
-        {{notes.as_p}}
+        {{notes|crispy}}
     </fieldset>
     <fieldset id="faults">
         <legend>Equipment Faults</legend>
-        {{faults.as_p}}
+        {{faults|crispy}}
     </fieldset>
     <input type="submit" value="Update">
 </form>
