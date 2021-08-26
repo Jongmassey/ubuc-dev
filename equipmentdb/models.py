@@ -1,3 +1,4 @@
+from enum import Enum
 from django.db import models
 from django.db.models import constraints
 from django.contrib.auth.models import User
@@ -5,14 +6,16 @@ from django.db.models.deletion import RESTRICT
 from django.urls import reverse_lazy
 import re
 
-def classToURL(class_name:str)->str:
-    exp = re.compile('([a-z])([A-Z])')
-    return exp.sub(r'\1-\2',class_name).lower()
 
-#abstract base class with common auditing fields
+def classToURL(class_name: str) -> str:
+    exp = re.compile("([a-z])([A-Z])")
+    return exp.sub(r"\1-\2", class_name).lower()
+
+
+# abstract base class with common auditing fields
 class UbucModel(models.Model):
-    created_on = models.DateTimeField(auto_now_add=True, null=False,editable=False)
-    updated_on = models.DateTimeField(auto_now=True, null=False,editable=False)
+    created_on = models.DateTimeField(auto_now_add=True, null=False, editable=False)
+    updated_on = models.DateTimeField(auto_now=True, null=False, editable=False)
     created_by = models.ForeignKey(
         User,
         null=False,
@@ -31,7 +34,7 @@ class UbucModel(models.Model):
     )
 
     def get_absolute_url(self):
-        return reverse_lazy(f'{classToURL(self.__class__.__name__)}-list')
+        return reverse_lazy(f"{classToURL(self.__class__.__name__)}-list")
 
     class Meta:
         abstract = True
@@ -39,6 +42,7 @@ class UbucModel(models.Model):
 
 class EquipmentType(UbucModel):
     name = models.CharField(max_length=255, null=False, blank=False)
+
     def __str__(self):
         return self.name
 
@@ -66,7 +70,7 @@ class Equipment(UbucModel):
         ]
 
     def __str__(self):
-        return f'{self.equipment_type} {self.ubuc_id}'
+        return f"{self.equipment_type} {self.ubuc_id}"
 
 
 class EquipmentNote(UbucModel):
@@ -112,6 +116,17 @@ class EquipmentTest(UbucModel):
 class EquipmentService(UbucModel):
     equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT)
 
+
+class FaultStatus(Enum):
+    NEW = 0
+    IN_PROGRESS = 1
+    FIXED = 2
+    UNFIXABLE = 3
+
+
 class EquipmentFault(UbucModel):
-    equipment = models.ForeignKey(Equipment,null=False,on_delete=RESTRICT)
-    notes = models.TextField(blank=False,null=False)
+    equipment = models.ForeignKey(Equipment, null=False, on_delete=RESTRICT)
+    notes = models.TextField(blank=False, null=False)
+    status = models.IntegerField(
+        choices=[(e, e.value) for e in FaultStatus], default=0, null=False
+    )
