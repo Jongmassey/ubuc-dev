@@ -1,6 +1,6 @@
 from django.urls import path
 from django.views.generic import TemplateView
-import equipmentdb.views as views
+
 import inspect
 from equipmentdb.model_base import classToURL
 from equipmentdb.views import (
@@ -8,6 +8,7 @@ from equipmentdb.views import (
     UbucBaseCreateView,
     UbucBaseUpdateView,
     UbucBaseUpdateView,
+    index
 )
 
 
@@ -33,7 +34,7 @@ def generatePath(view_class):
 
 
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("", index, name="index"),
     path("about/", TemplateView.as_view(template_name="about.html")),
 ]
 
