@@ -1,4 +1,3 @@
-from enum import Enum
 from django.db import models
 from django.db.models import constraints
 from django.contrib.auth.models import User
@@ -12,7 +11,21 @@ def classToURL(class_name: str) -> str:
     return exp.sub(r"\1-\2", class_name).lower()
 
 
-# abstract base class with common auditing fields
+class FaultStatus(models.IntegerChoices):
+    NEW = 0
+    IN_PROGRESS = 1
+    FIXED = 2
+    UNFIXABLE = 3
+    NO_FAULT =4
+
+# Tri-state boolean
+class ServiceStatus(models.IntegerChoices):
+    UNKNOWN = 0
+    IN_SERVICE = 1
+    OUT_OF_SERVICE = 2
+
+
+### abstract base class with common auditing fields
 class UbucModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=False, editable=False)
     updated_on = models.DateTimeField(auto_now=True, null=False, editable=False)
@@ -40,6 +53,10 @@ class UbucModel(models.Model):
         abstract = True
 
 
+class EquipmentManager(models.Manager):
+    pass
+
+
 class EquipmentType(UbucModel):
     name = models.CharField(max_length=255, null=False, blank=False)
 
@@ -61,6 +78,14 @@ class Equipment(UbucModel):
     )
     ubuc_id = models.IntegerField(null=False, blank=False)
     description = models.TextField(null=False, blank=False)
+
+    @property
+    def service_status(self) -> ServiceStatus:
+        return ServiceStatus.IN_SERVICE
+
+    @property
+    def fault_status(self) -> FaultStatus:
+        return FaultStatus.NO_FAULT
 
     class Meta:
         constraints = [
@@ -117,16 +142,7 @@ class EquipmentService(UbucModel):
     equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT)
 
 
-class FaultStatus(Enum):
-    NEW = 0
-    IN_PROGRESS = 1
-    FIXED = 2
-    UNFIXABLE = 3
-
-
 class EquipmentFault(UbucModel):
     equipment = models.ForeignKey(Equipment, null=False, on_delete=RESTRICT)
     notes = models.TextField(blank=False, null=False)
-    status = models.IntegerField(
-        choices=[(e, e.value) for e in FaultStatus], default=0, null=False
-    )
+    status = models.IntegerField(choices=FaultStatus.choices)
