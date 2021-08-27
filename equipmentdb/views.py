@@ -185,3 +185,17 @@ class EquipmentNoteUpdateView(UbucBaseUpdateView):
 
 class EquipmentNoteDeleteView(UbucBaseDeleteView):
     model = EquipmentNote
+
+
+# Service Schedules
+class EquipmentTypeServiceScheduleListView(UbucBaseListView):
+    model = EquipmentTypeServiceSchedule
+
+class EquipmentTypeServiceScheduleCreateView(UbucBaseCreateView):
+    model = EquipmentTypeServiceSchedule
+
+class EquipmentTypeServiceScheduleUpdateView(UbucBaseUpdateView):
+    model = EquipmentTypeServiceSchedule
+
+class EquipmentTypeServiceScheduleDeleteView(UbucBaseDeleteView):
+    model = EquipmentTypeServiceSchedule

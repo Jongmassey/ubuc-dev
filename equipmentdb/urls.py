@@ -55,4 +55,23 @@ urlpatterns = [
         EquipmentNoteDeleteView.as_view(),
         name="equipment-notedelete",
     ),
+    path("equipment-type-service-schedule", EquipmentTypeServiceScheduleListView.as_view(), name="equipment-type-service-schedule-list"),
+    path(
+        "equipment-type-service-schedule/add",
+        EquipmentTypeServiceScheduleCreateView.as_view(),
+        name="equipment-type-service-schedule-add",
+    ),
+    path(
+        "equipment-type-service-schedule/<int:pk>",
+        EquipmentTypeServiceScheduleUpdateView.as_view(),
+        name="equipment-type-service-schedule-update",
+    ),
+    path(
+        "equipment-type-service-schedule/<int:pk>/delete",
+        EquipmentTypeServiceScheduleDeleteView.as_view(),
+        name="equipment-type-service-scheduledelete",
+    ),
+
+
+
 ]

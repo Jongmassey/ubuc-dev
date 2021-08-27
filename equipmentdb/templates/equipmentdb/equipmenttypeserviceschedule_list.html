@@ -1,0 +1,14 @@
+{% extends "equipmentdb/base.html" %}
+{% block content %}
+<h2>Service Schedules</h2>
+<ul>
+    {% for equipment_type_service_schedule in object_list %}
+    <li>{{ equipment_type_service_schedule.equipment_type.name}} - {{equipment_type_service_schedule.name }} <a
+            href="./equipment-type-service-schedule/{{equipment_type_service_schedule.id}}">Edit</a> <a
+            href="./equipment-type-service-schedule/{{equipment_type_service_schedule.id}}/delete">Delete</a> </li>
+    {% empty %}
+    <li>No service schedules yet.</li>
+    {% endfor %}
+</ul>
+<a href="./equipment-type-service-schedule/add">Add new service schedule for an equipment type</a>
+{% endblock content %}
