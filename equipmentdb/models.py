@@ -152,6 +152,9 @@ class EquipmentTest(UbucModel):
         Equipment, null=False, on_delete=models.RESTRICT, related_name="tests"
     )
     test_type = models.ForeignKey(TestType, null=False, on_delete=RESTRICT)
+    date = models.DateField(null=False, blank=False, auto_now=True)
+    passed = models.BooleanField(null=False)
+    notes = models.TextField(null=True, blank=True)
 
 
 class EquipmentService(UbucModel):
