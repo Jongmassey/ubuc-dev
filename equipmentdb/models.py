@@ -185,6 +185,9 @@ class EquipmentTypeSchedule(UbucModel):
     class Meta:
         abstract = True
 
+    def __str__(self) -> str:
+        return f"{self.equipment_type.name} - {self.name}"
+
 
 class TestType(UbucModel):
     name = models.CharField(max_length=255, null=False, blank=False)
