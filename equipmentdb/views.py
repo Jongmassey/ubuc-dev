@@ -137,6 +137,17 @@ class EquipmentUpdateView(UbucBaseUpdateView):
         form.fields["service_time_remaining"] = forms.CharField(
             initial=equipment_item.service_time_remaining, disabled=True, required=False
         )
+
+        test_statuses = [(0, "Unknown")]
+        if -1 not in equipment_item.test_status.keys():
+            test_statuses = [
+                (ttid, f"{TestType.objects.get(pk=ttid).name} - {t_status.label}")
+                for ttid, t_status in equipment_item.test_status.items()
+            ]
+        form.fields["test_status"] = forms.MultipleChoiceField(
+            disabled=True, required=False, choices=test_statuses
+        )
+
         if "disposed_on" not in form.initial or form.initial["disposed_on"] == None:
             form.fields["disposal_note"].widget.attrs["bsHide"] = "collapse"
             form.fields["disposed_on"].widget.attrs[

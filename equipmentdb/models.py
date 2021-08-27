@@ -1,3 +1,4 @@
+from typing import Dict
 from django.db import models
 from django.db.models import constraints
 from django.contrib.auth.models import User
@@ -25,6 +26,10 @@ class ServiceStatus(models.IntegerChoices):
     IN_SERVICE = 1
     OUT_OF_SERVICE = 2
 
+class TestStatus(models.IntegerChoices):
+    UNKNOWN=0
+    IN_TEST=1
+    OUT_OF_TEST=2
 
 ### abstract base class with common auditing fields
 class UbucModel(models.Model):
@@ -103,6 +108,37 @@ class Equipment(UbucModel):
     @property
     def fault_status(self) -> FaultStatus:
         return self.faults.order_by("-created_on").first() or FaultStatus.NO_FAULT
+
+    @property
+    def test_status(self) -> Dict[int,TestStatus]:
+        if (
+            not self.tests.exists()
+            and not EquipmentTypeTestSchedule.objects.filter(equipment_type=self.equipment_type).exists()
+        ):
+            return {-1:TestStatus.UNKNOWN}
+        ret={}
+        for ts in EquipmentTypeTestSchedule.objects.filter(equipment_type=self.equipment_type):
+            most_recent_test = self.tests.filter(test_type=ts.test_type).orderby("-date").first()
+            interval = ts.interval
+            td = date.today() - (most_recent_test + interval)
+            ret[ts.test_type.id] = td
+        return ret
+
+    @property 
+    def test_time_remaining(self) ->Dict[int,timedelta]:
+        if (
+            not self.tests.exists()
+            or not EquipmentTypeTestSchedule.objects.filter(equipment_type=self.equipment_type).exists()
+        ):
+            return dict()
+        ret = {}
+        for ts in EquipmentTypeTestSchedule.objects.filter(equipment_type=self.equipment_type):
+            most_recent_test = self.tests.filter(test_type=ts.test_type).orderby("-date").first()
+            interval = ts.interval
+            td = date.today() - (most_recent_test + interval)
+            ret[ts.test_type.id] = td
+        return ret
+        
 
     class Meta:
         constraints = [
