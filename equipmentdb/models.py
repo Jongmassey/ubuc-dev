@@ -3,6 +3,7 @@ from django.db.models import constraints
 from django.contrib.auth.models import User
 from django.db.models.deletion import RESTRICT
 from django.urls import reverse_lazy
+from datetime import timedelta,date
 import re
 
 
@@ -78,7 +79,19 @@ class Equipment(UbucModel):
 
     @property
     def service_status(self) -> ServiceStatus:
+        if not self.services.exists() and self.equipment_type.equipmenttypeserviceschedule_set.exists():
+            return ServiceStatus.UNKNOWN
         return ServiceStatus.IN_SERVICE
+
+    @property
+    def service_time_remaining(self) -> models.DurationField:
+        if not self.services.exists() or not self.equipment_type.equipmenttypeserviceschedule_set.exists():
+            return models.DurationField(default=timedelta())
+        most_recent_service = self.services.orderby('-date').first().date
+        interval = self.equipment_type.equipmenttypeserviceschedule_set.first().interval
+        td = date.today() - (most_recent_service+interval)
+        return models.DurationField(default=td)
+        
 
     @property
     def fault_status(self) -> FaultStatus:
@@ -106,6 +119,8 @@ class Test(UbucModel):
 
 class Service(UbucModel):
     name = models.CharField(max_length=255, null=False, blank=False)
+    date = models.DateField(null=False,blank=False,auto_now=True)
+    notes = models.TextField(null=True,blank=True)
 
 
 class EquipmentTypeSchedule(UbucModel):
@@ -130,13 +145,12 @@ class EquipmentTypeServiceSchedule(EquipmentTypeSchedule):
         Service, null=False, blank=False, on_delete=models.RESTRICT
     )
 
-
 class EquipmentTest(UbucModel):
     equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT)
 
 
 class EquipmentService(UbucModel):
-    equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT)
+    equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT,related_name='services')
 
 
 class EquipmentFault(UbucModel):
