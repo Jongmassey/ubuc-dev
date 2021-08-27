@@ -13,14 +13,17 @@ from django import forms
 from django.forms import inlineformset_factory
 from django.template import loader
 
+
 class DateInput(forms.DateInput):
     input_type = "date"
 
+
 def index(request):
-    template = loader.get_template('equipmentdb/index.html')
+    template = loader.get_template("equipmentdb/index.html")
     return HttpResponse(template.render())
 
-#base views
+
+# base views
 class UbucBaseListView(ListView):
     paginate_by = 20
 
@@ -28,6 +31,7 @@ class UbucBaseListView(ListView):
         context = super().get_context_data(**kwargs)
         context["now"] = timezone.now()
         return context
+
 
 class UbucBaseCreateView(CreateView):
     fields = "__all__"
@@ -53,6 +57,7 @@ class UbucBaseCreateView(CreateView):
                 form.fields[f.name].widget = DateInput()
         return form
 
+
 class UbucBaseUpdateView(UpdateView):
     model = EquipmentType
     fields = "__all__"
@@ -66,7 +71,7 @@ class UbucBaseUpdateView(UpdateView):
         obj = form.save(commit=False)
         obj.updated_by = self.request.user
         return super(UbucBaseUpdateView, self).form_valid(form)
-    
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
 
@@ -77,58 +82,92 @@ class UbucBaseUpdateView(UpdateView):
                 form.fields[f.name].widget = DateInput()
         return form
 
+
 class UbucBaseDeleteView(DeleteView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.success_url = self.get_object().get_absolute_url()
         return super(UbucBaseDeleteView, self).dispatch(*args, **kwargs)
 
+
 # equipment types
 class EquipmentTypeListView(UbucBaseListView):
     model = EquipmentType
 
+
 class EquipmentTypeCreateView(UbucBaseCreateView):
     model = EquipmentType
+
 
 class EquipmentTypeUpdateView(UbucBaseUpdateView):
     model = EquipmentType
 
+
 class EquipmentTypeDeleteView(UbucBaseDeleteView):
     model = EquipmentType
+
 
 # equipment items
 class EquipmentListView(UbucBaseListView):
     model = Equipment
 
+
 class EquipmentCreateView(UbucBaseCreateView):
     model = Equipment
 
+
 class EquipmentUpdateView(UbucBaseUpdateView):
     model = Equipment
-    NoteFormSet = inlineformset_factory(Equipment,EquipmentNote,fields=('notes',),extra=1)   
-    FaultFormSet = inlineformset_factory(Equipment,EquipmentFault,fields=['notes','status'],extra=1)
+    NoteFormSet = inlineformset_factory(
+        Equipment, EquipmentNote, fields=("notes",), extra=1
+    )
+    FaultFormSet = inlineformset_factory(
+        Equipment, EquipmentFault, fields=["notes", "status"], extra=1
+    )
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        equipment_item = self.get_object()
+        form.fields["fault_status"] = forms.CharField(
+            initial=equipment_item.fault_status.label, disabled=True, required=False
+        )
+        form.fields["service_status"] = forms.CharField(
+            initial=equipment_item.service_status.label, disabled=True, required=False
+        )
+        if "disposed_on" not in form.initial or form.initial["disposed_on"] == None:
+            form.fields["disposal_note"].widget.attrs["bsHide"] = "collapse"
+            form.fields["disposed_on"].widget.attrs[
+                "onChange"
+            ] = "enable_disposal_note()"
+        return form
 
     def get_context_data(self, **kwargs):
-        ctx =  super().get_context_data(**kwargs)
+        ctx = super().get_context_data(**kwargs)
         equipment_item = self.get_object()
         notes = self.NoteFormSet(instance=equipment_item)
         faults = self.FaultFormSet(instance=equipment_item)
-        ctx['notes'] = notes
-        ctx['faults'] = faults
+        ctx["notes"] = notes
+        ctx["faults"] = faults
+        ctx["equipment_name"] = str(equipment_item)
         return ctx
+
 
 class EquipmentDeleteView(UbucBaseDeleteView):
     model = Equipment
+
 
 # Equipment Notes
 class EquipmentNoteListView(UbucBaseListView):
     model = EquipmentNote
 
+
 class EquipmentNoteCreateView(UbucBaseCreateView):
     model = EquipmentNote
 
+
 class EquipmentNoteUpdateView(UbucBaseUpdateView):
     model = EquipmentNote
+
 
 class EquipmentNoteDeleteView(UbucBaseDeleteView):
     model = EquipmentNote

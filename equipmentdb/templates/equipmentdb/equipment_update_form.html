@@ -1,18 +1,59 @@
 {% extends "equipmentdb/base.html" %}
 {% block content %}
 {% load crispy_forms_tags %}
+
 <form method="POST">{% csrf_token %}
     <fieldset id="equipment">
+        <legend>Equipment Item: {{equipment_name}}</legend>
         {{ form|crispy}}
     </fieldset>
     <fieldset id="notes">
-        <legend>Equipment Notes</legend>
-        {{notes|crispy}}
+        <legend><a data-bs-toggle="collapse" href="#notes-collapse" aria-expanded="false"
+                aria-controls="notes-collapse">Equipment Notes</a></legend>
+        <div class="collapse" id="notes-collapse">
+            {{notes|crispy}}
+        </div>
     </fieldset>
     <fieldset id="faults">
-        <legend>Equipment Faults</legend>
-        {{faults|crispy}}
+        <legend><a data-bs-toggle="collapse" href="#faults-collapse" aria-expanded="false"
+                aria-controls="faults-collapse">Equipment Faults</a></legend>
+        <div class="collapse" id="faults-collapse">
+            {{faults|crispy}}
+        </div>
     </fieldset>
     <input type="submit" value="Update">
 </form>
+<script type="text/javascript">
+
+    //init disposal note collapsed if date not populated
+    var elDisposalNote = document.getElementById('id_disposal_note')
+    if (elDisposalNote.getAttribute('bshide') == 'collapse') {
+        var divDisposalNote = document.getElementById('div_id_disposal_note')
+        divDisposalNote.classList.add('collapse')
+    }
+    var bsCollapse = new bootstrap.Collapse(divDisposalNote, {
+        toggle: false
+    })
+    bsCollapse.hide()
+
+    //called by disposal date onchange
+    function enable_disposal_note() {
+        bsCollapse.show()
+    }
+
+    //add date clear button
+    function clear_disposal_date() {
+        dispDate = document.getElementById('id_disposed_on')
+        dispDate.value = ''
+        if (elDisposalNote.value == '') {
+            divDisposalNote.classList.add('collapse')
+            bsCollapse.hide()
+        }
+    }
+    var clrbtn = document.createElement('button')
+    clrbtn.type = 'button'
+    clrbtn.onclick = clear_disposal_date
+    clrbtn.appendChild(document.createTextNode('X'))
+    document.getElementById('div_id_disposed_on').appendChild(clrbtn)
+</script>
 {% endblock content %}
