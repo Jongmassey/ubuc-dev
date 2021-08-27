@@ -10,11 +10,24 @@
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>UBUC Equipment Database</title>
-    </head>
 
-    <body>
-    {% block content %}{% endblock content %}
-    </body>
+<head>
+    <title>UBUC Equipment Database</title>
+</head>
+
+<body>
+    <main>
+        <div class="container">
+            <header class="p-3 bg-dark text-white">
+                <h1>UBUC Equipment Database</h1>
+                <div class="text-end">
+                    <button type="button" class="btn btn-outline-light me-2">Login</button>
+                    <button type="button" class="btn btn-warning">Sign-up</button>
+                  </div>
+            </header>
+            {% block content %}{% endblock content %}
+        </div>
+    </main>
+</body>
+
 </html>

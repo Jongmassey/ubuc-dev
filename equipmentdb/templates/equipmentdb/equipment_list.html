@@ -1,6 +1,6 @@
 {% extends "equipmentdb/base.html" %}
 {% block content %}
-<h1>Equipment Items</h1>
+<h2>Equipment Items</h2>
 <ul>
 {% for equipment in object_list %}
     <li>{{ equipment }} <a href="./equipment/{{equipment.id}}">Edit</a> <a href="./equipment/{{equipment.id}}/delete">Delete</a> </li>
