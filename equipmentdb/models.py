@@ -16,7 +16,8 @@ class FaultStatus(models.IntegerChoices):
     IN_PROGRESS = 1
     FIXED = 2
     UNFIXABLE = 3
-    NO_FAULT =4
+    NO_FAULT = 4
+
 
 # Tri-state boolean
 class ServiceStatus(models.IntegerChoices):
@@ -51,10 +52,6 @@ class UbucModel(models.Model):
 
     class Meta:
         abstract = True
-
-
-class EquipmentManager(models.Manager):
-    pass
 
 
 class EquipmentType(UbucModel):
