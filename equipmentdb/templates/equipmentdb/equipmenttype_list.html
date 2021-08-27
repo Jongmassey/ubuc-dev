@@ -3,10 +3,10 @@
 <h2>Equipment Types</h2>
 <ul>
 {% for equipment_type in object_list %}
-    <li>{{ equipment_type.name }} <a href="./equipment-types/{{equipment_type.id}}">Edit</a> <a href="./equipment-types/{{equipment_type.id}}/delete">Delete</a> </li>
+    <li>{{ equipment_type.name }} <a href="./equipment-type/{{equipment_type.id}}">Edit</a> <a href="./equipment-type/{{equipment_type.id}}/delete">Delete</a> </li>
 {% empty %}
     <li>No equipment types yet.</li>
 {% endfor %}
 </ul>
-<a href="./equipment-types/add">Add new equipment type</a>
+<a href="./equipment-type/add">Add new equipment type</a>
 {% endblock content %}
