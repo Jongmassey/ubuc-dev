@@ -3,7 +3,7 @@ from django.db.models import constraints
 from django.contrib.auth.models import User
 from django.db.models.deletion import RESTRICT
 from django.urls import reverse_lazy
-from datetime import timedelta,date
+from datetime import timedelta, date
 import re
 
 
@@ -20,7 +20,6 @@ class FaultStatus(models.IntegerChoices):
     NO_FAULT = 4
 
 
-# Tri-state boolean
 class ServiceStatus(models.IntegerChoices):
     UNKNOWN = 0
     IN_SERVICE = 1
@@ -79,23 +78,31 @@ class Equipment(UbucModel):
 
     @property
     def service_status(self) -> ServiceStatus:
-        if not self.services.exists() and self.equipment_type.equipmenttypeserviceschedule_set.exists():
+        if (
+            not self.services.exists()
+            and self.equipment_type.equipmenttypeserviceschedule_set.exists()
+        ):
             return ServiceStatus.UNKNOWN
+        else:
+            if self.service_time_remaining < 0:
+                return ServiceStatus.OUT_OF_SERVICE
         return ServiceStatus.IN_SERVICE
 
     @property
     def service_time_remaining(self) -> models.DurationField:
-        if not self.services.exists() or not self.equipment_type.equipmenttypeserviceschedule_set.exists():
-            return models.DurationField(default=timedelta())
-        most_recent_service = self.services.orderby('-date').first().date
+        if (
+            not self.services.exists()
+            or not self.equipment_type.equipmenttypeserviceschedule_set.exists()
+        ):
+            return models.DurationField(default=timedelta(), editable=False)
+        most_recent_service = self.services.orderby("-date").first().date
         interval = self.equipment_type.equipmenttypeserviceschedule_set.first().interval
-        td = date.today() - (most_recent_service+interval)
-        return models.DurationField(default=td)
-        
+        td = date.today() - (most_recent_service + interval)
+        return models.DurationField(default=td, editable=False)
 
     @property
     def fault_status(self) -> FaultStatus:
-        return self.faults.order_by('-created_on').first() or FaultStatus.NO_FAULT
+        return self.faults.order_by("-created_on").first() or FaultStatus.NO_FAULT
 
     class Meta:
         constraints = [
@@ -113,16 +120,6 @@ class EquipmentNote(UbucModel):
     notes = models.TextField(null=True, blank=True)
 
 
-class Test(UbucModel):
-    name = models.CharField(max_length=255, null=False, blank=False)
-
-
-class Service(UbucModel):
-    name = models.CharField(max_length=255, null=False, blank=False)
-    date = models.DateField(null=False,blank=False,auto_now=True)
-    notes = models.TextField(null=True,blank=True)
-
-
 class EquipmentTypeSchedule(UbucModel):
     equipment_type = models.ForeignKey(
         EquipmentType, null=False, blank=False, on_delete=models.RESTRICT
@@ -136,21 +133,34 @@ class EquipmentTypeSchedule(UbucModel):
         abstract = True
 
 
+class TestType(UbucModel):
+    name = models.CharField(max_length=255, null=False, blank=False)
+
+
 class EquipmentTypeTestSchedule(EquipmentTypeSchedule):
-    test = models.ForeignKey(Test, null=False, blank=False, on_delete=models.RESTRICT)
+    test_type = models.ForeignKey(
+        TestType, null=False, blank=False, on_delete=models.RESTRICT
+    )
 
 
 class EquipmentTypeServiceSchedule(EquipmentTypeSchedule):
-    service = models.ForeignKey(
-        Service, null=False, blank=False, on_delete=models.RESTRICT
-    )
+    pass
+
 
 class EquipmentTest(UbucModel):
-    equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT)
+    equipment = models.ForeignKey(
+        Equipment, null=False, on_delete=models.RESTRICT, related_name="tests"
+    )
+    test_type = models.ForeignKey(TestType, null=False, on_delete=RESTRICT)
 
 
 class EquipmentService(UbucModel):
-    equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT,related_name='services')
+    equipment = models.ForeignKey(
+        Equipment, null=False, on_delete=models.RESTRICT, related_name="services"
+    )
+    name = models.CharField(max_length=255, null=False, blank=False)
+    date = models.DateField(null=False, blank=False, auto_now=True)
+    notes = models.TextField(null=True, blank=True)
 
 
 class EquipmentFault(UbucModel):
