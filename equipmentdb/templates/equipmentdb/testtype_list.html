@@ -1,0 +1,14 @@
+{% extends "equipmentdb/base.html" %}
+{% block content %}
+<h2>Equipment Test Types</h2>
+<ul>
+    {% for test_type in object_list %}
+    <li>{{ test_type.name}} <a
+            href="./test-type/{{test_type.id}}">Edit</a> <a
+            href="./test-type/{{test_type.id}}/delete">Delete</a> </li>
+    {% empty %}
+    <li>No test types yet.</li>
+    {% endfor %}
+</ul>
+<a href="./test-type/add">Add new equipment test type</a>
+{% endblock content %}

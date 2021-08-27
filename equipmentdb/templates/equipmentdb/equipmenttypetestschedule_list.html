@@ -1,0 +1,14 @@
+{% extends "equipmentdb/base.html" %}
+{% block content %}
+<h2>Test Schedules</h2>
+<ul>
+    {% for equipment_type_test_schedule in object_list %}
+    <li>{{ equipment_type_test_schedule.equipment_type.name}} - {{equipment_type_test_schedule.name }} <a
+            href="./equipment-type-test-schedule/{{equipment_type_test_schedule.id}}">Edit</a> <a
+            href="./equipment-type-test-schedule/{{equipment_type_test_schedule.id}}/delete">Delete</a> </li>
+    {% empty %}
+    <li>No test schedules yet.</li>
+    {% endfor %}
+</ul>
+<a href="./equipment-type-test-schedule/add">Add new test schedule for an equipment type</a>
+{% endblock content %}

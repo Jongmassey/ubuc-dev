@@ -192,6 +192,9 @@ class EquipmentTypeSchedule(UbucModel):
 class TestType(UbucModel):
     name = models.CharField(max_length=255, null=False, blank=False)
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class EquipmentTypeTestSchedule(EquipmentTypeSchedule):
     test_type = models.ForeignKey(

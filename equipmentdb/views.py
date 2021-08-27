@@ -199,3 +199,29 @@ class EquipmentTypeServiceScheduleUpdateView(UbucBaseUpdateView):
 
 class EquipmentTypeServiceScheduleDeleteView(UbucBaseDeleteView):
     model = EquipmentTypeServiceSchedule
+
+# Test Schedules
+class EquipmentTypeTestScheduleListView(UbucBaseListView):
+    model = EquipmentTypeTestSchedule
+
+class EquipmentTypeTestScheduleCreateView(UbucBaseCreateView):
+    model = EquipmentTypeTestSchedule
+
+class EquipmentTypeTestScheduleUpdateView(UbucBaseUpdateView):
+    model = EquipmentTypeTestSchedule
+
+class EquipmentTypeTestScheduleDeleteView(UbucBaseDeleteView):
+    model = EquipmentTypeTestSchedule
+
+# Test Types
+class TestTypeListView(UbucBaseListView):
+    model = TestType
+
+class TestTypeCreateView(UbucBaseCreateView):
+    model = TestType
+
+class TestTypeUpdateView(UbucBaseUpdateView):
+    model = TestType
+
+class TestTypeDeleteView(UbucBaseDeleteView):
+    model = TestType

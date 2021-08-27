@@ -55,7 +55,11 @@ urlpatterns = [
         EquipmentNoteDeleteView.as_view(),
         name="equipment-notedelete",
     ),
-    path("equipment-type-service-schedule", EquipmentTypeServiceScheduleListView.as_view(), name="equipment-type-service-schedule-list"),
+    path(
+        "equipment-type-service-schedule",
+        EquipmentTypeServiceScheduleListView.as_view(),
+        name="equipment-type-service-schedule-list",
+    ),
     path(
         "equipment-type-service-schedule/add",
         EquipmentTypeServiceScheduleCreateView.as_view(),
@@ -71,7 +75,44 @@ urlpatterns = [
         EquipmentTypeServiceScheduleDeleteView.as_view(),
         name="equipment-type-service-scheduledelete",
     ),
-
-
-
+    path(
+        "equipment-type-test-schedule",
+        EquipmentTypeTestScheduleListView.as_view(),
+        name="equipment-type-test-schedule-list",
+    ),
+    path(
+        "equipment-type-test-schedule/add",
+        EquipmentTypeTestScheduleCreateView.as_view(),
+        name="equipment-type-test-schedule-add",
+    ),
+    path(
+        "equipment-type-test-schedule/<int:pk>",
+        EquipmentTypeTestScheduleUpdateView.as_view(),
+        name="equipment-type-test-schedule-update",
+    ),
+    path(
+        "equipment-type-test-schedule/<int:pk>/delete",
+        EquipmentTypeTestScheduleDeleteView.as_view(),
+        name="equipment-type-test-scheduledelete",
+    ),
+    path(
+        "test-type",
+        TestTypeListView.as_view(),
+        name="test-type-list",
+    ),
+    path(
+        "test-type/add",
+        TestTypeCreateView.as_view(),
+        name="test-type-add",
+    ),
+    path(
+        "test-type/<int:pk>",
+        TestTypeUpdateView.as_view(),
+        name="test-type-update",
+    ),
+    path(
+        "test-type/<int:pk>/delete",
+        TestTypeDeleteView.as_view(),
+        name="test-typedelete",
+    ),
 ]
