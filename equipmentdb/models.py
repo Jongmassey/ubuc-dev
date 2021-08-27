@@ -82,7 +82,7 @@ class Equipment(UbucModel):
 
     @property
     def fault_status(self) -> FaultStatus:
-        return FaultStatus.NO_FAULT
+        return self.faults.order_by('-created_on').first() or FaultStatus.NO_FAULT
 
     class Meta:
         constraints = [
@@ -140,6 +140,8 @@ class EquipmentService(UbucModel):
 
 
 class EquipmentFault(UbucModel):
-    equipment = models.ForeignKey(Equipment, null=False, on_delete=RESTRICT)
+    equipment = models.ForeignKey(
+        Equipment, null=False, on_delete=RESTRICT, related_name="faults"
+    )
     notes = models.TextField(blank=False, null=False)
     status = models.IntegerField(choices=FaultStatus.choices)
