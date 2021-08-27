@@ -80,11 +80,11 @@ class Equipment(UbucModel):
     def service_status(self) -> ServiceStatus:
         if (
             not self.services.exists()
-            and self.equipment_type.equipmenttypeserviceschedule_set.exists()
+            and not self.equipment_type.equipmenttypeserviceschedule_set.exists()
         ):
             return ServiceStatus.UNKNOWN
         else:
-            if self.service_time_remaining < 0:
+            if self.service_time_remaining < models.DurationField(timedelta()):
                 return ServiceStatus.OUT_OF_SERVICE
         return ServiceStatus.IN_SERVICE
 
