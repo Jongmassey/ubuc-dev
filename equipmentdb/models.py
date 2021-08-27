@@ -84,21 +84,21 @@ class Equipment(UbucModel):
         ):
             return ServiceStatus.UNKNOWN
         else:
-            if self.service_time_remaining < models.DurationField(timedelta()):
+            if self.service_time_remaining < timedelta():
                 return ServiceStatus.OUT_OF_SERVICE
         return ServiceStatus.IN_SERVICE
 
     @property
-    def service_time_remaining(self) -> models.DurationField:
+    def service_time_remaining(self) -> timedelta:
         if (
             not self.services.exists()
             or not self.equipment_type.equipmenttypeserviceschedule_set.exists()
         ):
-            return models.DurationField(default=timedelta(), editable=False)
+            return timedelta()
         most_recent_service = self.services.orderby("-date").first().date
         interval = self.equipment_type.equipmenttypeserviceschedule_set.first().interval
         td = date.today() - (most_recent_service + interval)
-        return models.DurationField(default=td, editable=False)
+        return td
 
     @property
     def fault_status(self) -> FaultStatus:

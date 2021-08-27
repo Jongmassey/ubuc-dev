@@ -134,6 +134,9 @@ class EquipmentUpdateView(UbucBaseUpdateView):
         form.fields["service_status"] = forms.CharField(
             initial=equipment_item.service_status.label, disabled=True, required=False
         )
+        form.fields["service_time_remaining"] = forms.CharField(
+            initial=equipment_item.service_time_remaining, disabled=True, required=False
+        )
         if "disposed_on" not in form.initial or form.initial["disposed_on"] == None:
             form.fields["disposal_note"].widget.attrs["bsHide"] = "collapse"
             form.fields["disposed_on"].widget.attrs[
