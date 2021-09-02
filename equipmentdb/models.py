@@ -60,6 +60,16 @@ class Equipment(UbucModel):
         return FaultStatus.NO_FAULT
 
     @property
+    def test_status_formatted(self):
+        test_statuses = [(0, "Unknown")]
+        if -1 not in self.test_status.keys():
+            test_statuses = [
+                (ttid, f"{TestType.objects.get(pk=ttid).name} - {t_status.label}")
+                for ttid, t_status in self.test_status.items()
+            ]
+        return test_statuses
+
+    @property
     def test_status(self) -> Dict[int, TestStatus]:
         if (
             not self.tests.exists()

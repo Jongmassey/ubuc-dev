@@ -1,12 +1,30 @@
 {% extends "equipmentdb/base.html" %}
 {% block content %}
 <h2>Equipment Items</h2>
-<ul>
-{% for equipment in object_list %}
-    <li>{{ equipment }} <a href="./equipment/{{equipment.id}}">Edit</a> <a href="./equipment/{{equipment.id}}/delete">Delete</a> </li>
-{% empty %}
+<table class="table">
+    <thead>
+    <th scope="col">Type</th>
+    <th scope="col">ID</th>
+    <th scope="col">Fault Status</th>
+    <th scope="col">Service Status</th>
+    <th scope="col">Test Status</th>
+    <th scope="col"></th>
+    <th scope="col"></th>
+    </thead>
+    {% for equipment in object_list %}
+    <tr>
+        <td>{{equipment.equipment_type}}</td>
+        <td>{{equipment.ubuc_id}}</td>
+        <td>{{equipment.fault_status.label}}</td>
+        <td>{{equipment.service_status.label}}</td>
+        <td>{% for teststatus in equipment.test_status_formatted%} {{teststatus.1}}<br/>{% endfor %}</td>
+        <td><a href="./equipment/{{equipment.id}}">Edit</a></td>
+        <td><a href="./equipment/{{equipment.id}}/delete">Delete</a></td>
+    </tr>
+    {% empty %}
     <li>No equipment items yet.</li>
-{% endfor %}
-</ul>
-<a href="./equipment/add">Add new equipment item</a>
-{% endblock content %}
+    {% endfor %}
+    </ul>
+</table>
+    <a href="./equipment/add">Add new equipment item</a>
+    {% endblock content %}
