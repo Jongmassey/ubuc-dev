@@ -1,6 +1,5 @@
 from django.urls import path
 from django.views.generic import TemplateView
-
 import inspect
 from equipmentdb.model_base import classToURL
 from equipmentdb.views import (
@@ -8,8 +7,9 @@ from equipmentdb.views import (
     UbucBaseCreateView,
     UbucBaseUpdateView,
     UbucBaseUpdateView,
-    index
+    index,
 )
+from . import views
 
 
 def generatePath(view_class):
