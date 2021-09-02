@@ -27,6 +27,12 @@ class UbucModel(models.Model):
     def get_absolute_url(self):
         return reverse_lazy(f"{classToURL(self.__class__.__name__)}-list")
 
+    def save_with_user(self,user) -> None:
+        self.updated_by = user
+        if self.created_by_id is None:
+            self.created_by=user
+        return super().save()
+
     class Meta:
         abstract = True
 

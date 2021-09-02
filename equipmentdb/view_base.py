@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.models import BaseInlineFormSet
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models.fields import DateField
@@ -75,3 +76,11 @@ class UbucBaseDeleteView(DeleteView):
     def dispatch(self, *args, **kwargs):
         self.success_url = self.get_object().get_absolute_url()
         return super(UbucBaseDeleteView, self).dispatch(*args, **kwargs)
+
+class UbucInlineFormSet(BaseInlineFormSet):
+    def save(self,user):
+        objs = super().save(commit=False)
+        for obj in objs:
+            obj.save_with_user(user=user)
+        for delobj in self.deleted_objects:
+            delobj.delete()
