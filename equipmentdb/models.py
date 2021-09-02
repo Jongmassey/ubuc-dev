@@ -54,7 +54,10 @@ class Equipment(UbucModel):
 
     @property
     def fault_status(self) -> FaultStatus:
-        return self.faults.order_by("-created_on").first() or FaultStatus.NO_FAULT
+        fst = self.faults
+        if fst.count() >0:
+            return FaultStatus(fst.order_by("-created_on").first().status)
+        return FaultStatus.NO_FAULT
 
     @property
     def test_status(self) -> Dict[int, TestStatus]:
@@ -69,6 +72,9 @@ class Equipment(UbucModel):
         for test_schedule in EquipmentTypeTestSchedule.objects.filter(
             equipment_type=self.equipment_type
         ):
+            if self.tests.count()==0:
+                ret[test_schedule.test_type.id] = TestStatus.OUT_OF_TEST
+                continue
             most_recent_test = (
                 self.tests.filter(test_type=test_schedule.test_type)
                 .orderby("-date")
@@ -76,7 +82,7 @@ class Equipment(UbucModel):
             )
             interval = test_schedule.interval
             td = date.today() - (most_recent_test + interval)
-            ret[test_schedule.test_type.id] = td
+            ret[test_schedule.test_type.id] = TestStatus.OUT_OF_TEST if td<0 else TestStatus.IN_TEST
         return ret
 
     @property
