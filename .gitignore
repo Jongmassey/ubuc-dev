@@ -1,3 +1,7 @@
+#staging and prod env files
+.env*.prod
+.env*.staging
+
 #database files
 data/
 
