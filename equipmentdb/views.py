@@ -5,11 +5,13 @@ from equipmentdb.view_base import (
     UbucBaseListView,
     UbucBaseDeleteView,
     UbucBaseUpdateView,
+    UbucInlineFormSet
 )
 from django import forms
 from django.forms import inlineformset_factory
 from django.http import HttpResponse
 from django.template import loader
+from django.db import transaction
 
 
 def index(request):
@@ -46,10 +48,10 @@ class EquipmentCreateView(UbucBaseCreateView):
 class EquipmentUpdateView(UbucBaseUpdateView):
     model = Equipment
     NoteFormSet = inlineformset_factory(
-        Equipment, EquipmentNote, fields=("notes",), extra=1
+        Equipment, EquipmentNote, fields=("notes",), extra=1,formset=UbucInlineFormSet
     )
     FaultFormSet = inlineformset_factory(
-        Equipment, EquipmentFault, fields=["notes", "status"], extra=1
+        Equipment, EquipmentFault, fields=["notes", "status"], extra=1, can_delete= False,formset=UbucInlineFormSet
     )
 
     def get_form(self, form_class=None):
@@ -85,13 +87,39 @@ class EquipmentUpdateView(UbucBaseUpdateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         equipment_item = self.get_object()
-        notes = self.NoteFormSet(instance=equipment_item)
-        faults = self.FaultFormSet(instance=equipment_item)
+        if self.request.POST:
+            notes = self.NoteFormSet(self.request.POST, instance=equipment_item)
+            faults = self.FaultFormSet(self.request.POST, instance=equipment_item)
+        else:
+            notes = self.NoteFormSet(instance=equipment_item)
+            faults = self.FaultFormSet(instance=equipment_item)
         ctx["notes"] = notes
         ctx["faults"] = faults
         ctx["equipment_name"] = str(equipment_item)
+        
         return ctx
 
+    def form_valid(self, form):
+        context = self.get_context_data()
+        notes = context['notes']
+        faults = context['faults']
+        with transaction.atomic():
+            self.object = form.save()
+            if notes.is_valid():
+                notes.save(self.request.user)
+            else:
+                raise ValueError (f""" notes form did not validate:
+
+                {notes.errors}
+                """)
+            if faults.is_valid():
+                faults.save(self.request.user)
+            else:
+                raise ValueError(f""" faults form did not validate:
+                
+                {faults.errors}
+                """)
+        return super(EquipmentUpdateView,self).form_valid(form)
 
 class EquipmentDeleteView(UbucBaseDeleteView):
     model = Equipment
