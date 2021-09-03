@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import constraints
 from django.db.models.deletion import RESTRICT
 from datetime import timedelta, date
-from equipmentdb.model_base import UbucModel, ServiceStatus, TestStatus, FaultStatus
+from equipmentdb.model_base import Media, UbucModel, ServiceStatus, TestStatus, FaultStatus
 
 
 class EquipmentType(UbucModel):
@@ -192,3 +192,18 @@ class EquipmentFault(UbucModel):
     )
     notes = models.TextField(blank=False, null=False)
     status = models.IntegerField(choices=FaultStatus.choices)
+
+class EquipmentMedia(Media):
+    equipment = models.ForeignKey(
+        Equipment, null=False, on_delete=RESTRICT, related_name="media"
+    )
+
+class FaultMedia(Media):
+    fault = models.ForeignKey(
+        EquipmentFault, null=False, on_delete=RESTRICT, related_name="media"
+    )
+    
+class ServiceMedia(Media):
+    service = models.ForeignKey(
+        EquipmentService, null=False, on_delete=RESTRICT, related_name="media"
+    )
