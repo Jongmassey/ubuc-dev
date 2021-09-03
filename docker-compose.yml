@@ -16,6 +16,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - s3
     env_file:
       - ./.env.dev
   s3:
