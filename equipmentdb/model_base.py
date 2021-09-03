@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls.base import reverse_lazy
 import re
+import uuid
 
 ### abstract base class with common auditing fields
 class UbucModel(models.Model):
@@ -36,6 +37,14 @@ class UbucModel(models.Model):
     class Meta:
         abstract = True
 
+class Media(UbucModel):
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False,
+    )
+    name = models.CharField(max_length=255)
+    file = models.FileField()
+    class Meta:
+        abstract = True
 
 def classToURL(class_name: str) -> str:
     exp = re.compile("([a-z])([A-Z])")
