@@ -78,6 +78,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ubuc.wsgi.application'
 
+# File Storage
+DEFAULT_FILE_STORAGE = environ.get("DEFAULT_FILE_STORAGE")
+AWS_STORAGE_BUCKET_NAME = environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = environ.get("AWS_S3_REGION_NAME")
+AWS_ACCESS_KEY_ID = environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_S3_ENDPOINT_URL = environ.get("AWS_S3_ENDPOINT_URL")
+
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
