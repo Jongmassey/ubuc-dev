@@ -1,3 +1,7 @@
+#dev s3 files
+s3/*/*
+!s3/*/.gitkeep
+
 #staging and prod env files
 .env*.prod
 .env*.staging
