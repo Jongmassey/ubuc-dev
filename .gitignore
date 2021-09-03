@@ -1,13 +1,13 @@
 #dev s3 files
-s3/*/*
-!s3/*/.gitkeep
+data/s3/*/*
+!data/s3/*/.gitkeep
 
 #staging and prod env files
 .env*.prod
 .env*.staging
 
 #database files
-data/
+data/db/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

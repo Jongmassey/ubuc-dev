@@ -21,7 +21,7 @@ services:
   s3:
     image: zenko/cloudserver
     volumes:
-      - ./s3:/data
+      - ./data/s3:/data
       - ./zenko.cloudserver.config.json:/usr/src/app/config.json
     ports: 
       - "8100:8000"
