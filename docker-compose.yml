@@ -16,5 +16,15 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - s3
     env_file:
       - ./.env.dev
+  s3:
+    image: zenko/cloudserver
+    volumes:
+      - ./data/s3:/data
+      - ./zenko.cloudserver.config.json:/usr/src/app/config.json
+    ports: 
+      - "8100:8000"
+    env_file: 
+      - ./.env.dev.s3
