@@ -3,7 +3,13 @@ from django.db import models
 from django.db.models import constraints
 from django.db.models.deletion import RESTRICT
 from datetime import timedelta, date
-from equipmentdb.model_base import Media, UbucModel, ServiceStatus, TestStatus, FaultStatus
+from equipmentdb.model_base import (
+    Media,
+    UbucModel,
+    ServiceStatus,
+    TestStatus,
+    FaultStatus,
+)
 
 
 class EquipmentType(UbucModel):
@@ -55,7 +61,7 @@ class Equipment(UbucModel):
     @property
     def fault_status(self) -> FaultStatus:
         fst = self.faults
-        if fst.count() >0:
+        if fst.count() > 0:
             return FaultStatus(fst.order_by("-created_on").first().status)
         return FaultStatus.NO_FAULT
 
@@ -82,7 +88,7 @@ class Equipment(UbucModel):
         for test_schedule in EquipmentTypeTestSchedule.objects.filter(
             equipment_type=self.equipment_type
         ):
-            if self.tests.count()==0:
+            if self.tests.count() == 0:
                 ret[test_schedule.test_type.id] = TestStatus.OUT_OF_TEST
                 continue
             most_recent_test = (
@@ -92,7 +98,9 @@ class Equipment(UbucModel):
             )
             interval = test_schedule.interval
             td = date.today() - (most_recent_test + interval)
-            ret[test_schedule.test_type.id] = TestStatus.OUT_OF_TEST if td<0 else TestStatus.IN_TEST
+            ret[test_schedule.test_type.id] = (
+                TestStatus.OUT_OF_TEST if td < 0 else TestStatus.IN_TEST
+            )
         return ret
 
     @property
@@ -193,17 +201,26 @@ class EquipmentFault(UbucModel):
     notes = models.TextField(blank=False, null=False)
     status = models.IntegerField(choices=FaultStatus.choices)
 
+
 class EquipmentMedia(Media):
     equipment = models.ForeignKey(
         Equipment, null=False, on_delete=RESTRICT, related_name="media"
     )
 
+
 class FaultMedia(Media):
     fault = models.ForeignKey(
         EquipmentFault, null=False, on_delete=RESTRICT, related_name="media"
     )
-    
+
+
 class ServiceMedia(Media):
     service = models.ForeignKey(
         EquipmentService, null=False, on_delete=RESTRICT, related_name="media"
+    )
+
+
+class TestMedia(Media):
+    test = models.ForeignKey(
+        EquipmentTest, null=False, on_delete=RESTRICT, related_name="media"
     )
