@@ -5,7 +5,7 @@ from equipmentdb.view_base import (
     UbucBaseListView,
     UbucBaseDeleteView,
     UbucBaseUpdateView,
-    UbucInlineFormSet
+    UbucInlineFormSet,
 )
 from django import forms
 from django.forms import inlineformset_factory
@@ -48,10 +48,22 @@ class EquipmentCreateView(UbucBaseCreateView):
 class EquipmentUpdateView(UbucBaseUpdateView):
     model = Equipment
     NoteFormSet = inlineformset_factory(
-        Equipment, EquipmentNote, fields=("notes",), extra=1,formset=UbucInlineFormSet
+        Equipment, EquipmentNote, fields=("notes",), extra=1, formset=UbucInlineFormSet
     )
     FaultFormSet = inlineformset_factory(
-        Equipment, EquipmentFault, fields=["notes", "status"], extra=1, can_delete= False,formset=UbucInlineFormSet
+        Equipment,
+        EquipmentFault,
+        fields=["notes", "status"],
+        extra=1,
+        can_delete=False,
+        formset=UbucInlineFormSet,
+    )
+    MediaFormSet = inlineformset_factory(
+        Equipment,
+        EquipmentMedia,
+        fields=["name", "file"],
+        extra=1,
+        formset=UbucInlineFormSet,
     )
 
     def get_form(self, form_class=None):
@@ -84,36 +96,54 @@ class EquipmentUpdateView(UbucBaseUpdateView):
         if self.request.POST:
             notes = self.NoteFormSet(self.request.POST, instance=equipment_item)
             faults = self.FaultFormSet(self.request.POST, instance=equipment_item)
+            media = self.MediaFormSet(self.request.POST,self.request.FILES,instance=equipment_item)
         else:
             notes = self.NoteFormSet(instance=equipment_item)
             faults = self.FaultFormSet(instance=equipment_item)
+            media = self.MediaFormSet(instance=equipment_item)
         ctx["notes"] = notes
         ctx["faults"] = faults
+        ctx["media"] = media
         ctx["equipment_name"] = str(equipment_item)
-        
+
         return ctx
 
     def form_valid(self, form):
         context = self.get_context_data()
-        notes = context['notes']
-        faults = context['faults']
+        notes = context["notes"]
+        faults = context["faults"]
+        media = context["media"]
         with transaction.atomic():
             self.object = form.save()
             if notes.is_valid():
                 notes.save(self.request.user)
             else:
-                raise ValueError (f""" notes form did not validate:
+                raise ValueError(
+                    f""" notes form did not validate:
 
                 {notes.errors}
-                """)
+                """
+                )
             if faults.is_valid():
                 faults.save(self.request.user)
             else:
-                raise ValueError(f""" faults form did not validate:
+                raise ValueError(
+                    f""" faults form did not validate:
                 
                 {faults.errors}
-                """)
-        return super(EquipmentUpdateView,self).form_valid(form)
+                """
+                )
+            if media.is_valid():
+                media.save(self.request.user)
+            else:
+                raise ValueError(
+                    f""" media form did not validate:
+                
+                {media.errors}
+                """
+                )
+        return super(EquipmentUpdateView, self).form_valid(form)
+
 
 class EquipmentDeleteView(UbucBaseDeleteView):
     model = Equipment

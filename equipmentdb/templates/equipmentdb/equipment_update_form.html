@@ -2,10 +2,14 @@
 {% block content %}
 {% load crispy_forms_tags %}
 
-<form method="POST">{% csrf_token %}
+<form method="POST" enctype="multipart/form-data">{% csrf_token %}
     <fieldset id="equipment">
         <legend>Equipment Item: {{equipment_name}}</legend>
         {{ form|crispy}}
+    </fieldset>
+    <fieldset id="media">
+        <legend>Equipment Media</legend>
+        {{ media|crispy}}
     </fieldset>
     <fieldset id="notes">
         <legend><a data-bs-toggle="collapse" href="#notes-collapse" aria-expanded="false"
