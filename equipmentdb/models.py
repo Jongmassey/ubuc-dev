@@ -3,7 +3,12 @@ from django.db import models
 from django.db.models import constraints
 from django.db.models.deletion import RESTRICT
 from datetime import timedelta, date
-from equipmentdb.model_base import UbucModel, ServiceStatus, TestStatus, FaultStatus
+from equipmentdb.model_base import (
+    UbucModel,
+    ServiceStatus,
+    TestStatus,
+    FaultStatus,
+)
 
 
 class EquipmentType(UbucModel):
@@ -48,14 +53,16 @@ class Equipment(UbucModel):
         ):
             return timedelta()
         most_recent_service = self.services.orderby("-date").first().date
-        interval = self.equipment_type.equipmenttypeserviceschedule_set.first().interval
+        interval = (
+            self.equipment_type.equipmenttypeserviceschedule_set.first().interval
+        )
         td = date.today() - (most_recent_service + interval)
         return td
 
     @property
     def fault_status(self) -> FaultStatus:
         fst = self.faults
-        if fst.count() >0:
+        if fst.count() > 0:
             return FaultStatus(fst.order_by("-created_on").first().status)
         return FaultStatus.NO_FAULT
 
@@ -64,7 +71,10 @@ class Equipment(UbucModel):
         test_statuses = [(0, "Unknown")]
         if -1 not in self.test_status.keys():
             test_statuses = [
-                (ttid, f"{TestType.objects.get(pk=ttid).name} - {t_status.label}")
+                (
+                    ttid,
+                    f"{TestType.objects.get(pk=ttid).name} - {t_status.label}",
+                )
                 for ttid, t_status in self.test_status.items()
             ]
         return test_statuses
@@ -82,7 +92,7 @@ class Equipment(UbucModel):
         for test_schedule in EquipmentTypeTestSchedule.objects.filter(
             equipment_type=self.equipment_type
         ):
-            if self.tests.count()==0:
+            if self.tests.count() == 0:
                 ret[test_schedule.test_type.id] = TestStatus.OUT_OF_TEST
                 continue
             most_recent_test = (
@@ -92,7 +102,9 @@ class Equipment(UbucModel):
             )
             interval = test_schedule.interval
             td = date.today() - (most_recent_test + interval)
-            ret[test_schedule.test_type.id] = TestStatus.OUT_OF_TEST if td<0 else TestStatus.IN_TEST
+            ret[test_schedule.test_type.id] = (
+                TestStatus.OUT_OF_TEST if td < 0 else TestStatus.IN_TEST
+            )
         return ret
 
     @property
@@ -130,7 +142,9 @@ class Equipment(UbucModel):
 
 
 class EquipmentNote(UbucModel):
-    equipment = models.ForeignKey(Equipment, null=False, on_delete=models.RESTRICT)
+    equipment = models.ForeignKey(
+        Equipment, null=False, on_delete=models.RESTRICT
+    )
     notes = models.TextField(null=True, blank=True)
 
 
@@ -179,7 +193,10 @@ class EquipmentTest(UbucModel):
 
 class EquipmentService(UbucModel):
     equipment = models.ForeignKey(
-        Equipment, null=False, on_delete=models.RESTRICT, related_name="services"
+        Equipment,
+        null=False,
+        on_delete=models.RESTRICT,
+        related_name="services",
     )
     name = models.CharField(max_length=255, null=False, blank=False)
     date = models.DateField(null=False, blank=False, auto_now=True)

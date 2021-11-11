@@ -77,8 +77,9 @@ class UbucBaseDeleteView(DeleteView):
         self.success_url = self.get_object().get_absolute_url()
         return super(UbucBaseDeleteView, self).dispatch(*args, **kwargs)
 
+
 class UbucInlineFormSet(BaseInlineFormSet):
-    def save(self,user):
+    def save(self, user):
         objs = super().save(commit=False)
         for obj in objs:
             obj.save_with_user(user=user)

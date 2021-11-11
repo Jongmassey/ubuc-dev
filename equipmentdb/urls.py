@@ -6,7 +6,6 @@ from equipmentdb.views import (
     UbucBaseListView,
     UbucBaseCreateView,
     UbucBaseUpdateView,
-    UbucBaseUpdateView,
     index,
 )
 from . import views
@@ -18,7 +17,9 @@ def generatePath(view_class):
     if UbucBaseListView in view_class.__bases__:
         return path(model_url, view_class.as_view(), name=f"{model_url}-list")
     if UbucBaseCreateView in view_class.__bases__:
-        return path(f"{model_url}/add", view_class.as_view(), name=f"{model_url}-add")
+        return path(
+            f"{model_url}/add", view_class.as_view(), name=f"{model_url}-add"
+        )
     if UbucBaseUpdateView in view_class.__bases__:
         return path(
             f"{model_url}/<int:pk>",

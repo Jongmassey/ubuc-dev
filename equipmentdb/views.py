@@ -1,11 +1,18 @@
-from equipmentdb.models import EquipmentType
-from equipmentdb.models import *
+from equipmentdb.models import (
+    Equipment,
+    EquipmentFault,
+    EquipmentNote,
+    EquipmentType,
+    EquipmentTypeServiceSchedule,
+    EquipmentTypeTestSchedule,
+    TestType,
+)
 from equipmentdb.view_base import (
     UbucBaseCreateView,
     UbucBaseListView,
     UbucBaseDeleteView,
     UbucBaseUpdateView,
-    UbucInlineFormSet
+    UbucInlineFormSet,
 )
 from django import forms
 from django.forms import inlineformset_factory
@@ -48,30 +55,50 @@ class EquipmentCreateView(UbucBaseCreateView):
 class EquipmentUpdateView(UbucBaseUpdateView):
     model = Equipment
     NoteFormSet = inlineformset_factory(
-        Equipment, EquipmentNote, fields=("notes",), extra=1,formset=UbucInlineFormSet
+        Equipment,
+        EquipmentNote,
+        fields=("notes",),
+        extra=1,
+        formset=UbucInlineFormSet,
     )
     FaultFormSet = inlineformset_factory(
-        Equipment, EquipmentFault, fields=["notes", "status"], extra=1, can_delete= False,formset=UbucInlineFormSet
+        Equipment,
+        EquipmentFault,
+        fields=["notes", "status"],
+        extra=1,
+        can_delete=False,
+        formset=UbucInlineFormSet,
     )
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         equipment_item = self.get_object()
         form.fields["fault_status"] = forms.CharField(
-            initial=equipment_item.fault_status.label, disabled=True, required=False
+            initial=equipment_item.fault_status.label,
+            disabled=True,
+            required=False,
         )
         form.fields["service_status"] = forms.CharField(
-            initial=equipment_item.service_status.label, disabled=True, required=False
+            initial=equipment_item.service_status.label,
+            disabled=True,
+            required=False,
         )
         form.fields["service_time_remaining"] = forms.CharField(
-            initial=equipment_item.service_time_remaining, disabled=True, required=False
+            initial=equipment_item.service_time_remaining,
+            disabled=True,
+            required=False,
         )
 
         form.fields["test_status"] = forms.MultipleChoiceField(
-            disabled=True, required=False, choices=equipment_item.test_status_formatted
+            disabled=True,
+            required=False,
+            choices=equipment_item.test_status_formatted,
         )
 
-        if "disposed_on" not in form.initial or form.initial["disposed_on"] == None:
+        if (
+            "disposed_on" not in form.initial
+            or form.initial["disposed_on"] is None
+        ):
             form.fields["disposal_note"].widget.attrs["bsHide"] = "collapse"
             form.fields["disposed_on"].widget.attrs[
                 "onChange"
@@ -82,38 +109,47 @@ class EquipmentUpdateView(UbucBaseUpdateView):
         ctx = super().get_context_data(**kwargs)
         equipment_item = self.get_object()
         if self.request.POST:
-            notes = self.NoteFormSet(self.request.POST, instance=equipment_item)
-            faults = self.FaultFormSet(self.request.POST, instance=equipment_item)
+            notes = self.NoteFormSet(
+                self.request.POST, instance=equipment_item
+            )
+            faults = self.FaultFormSet(
+                self.request.POST, instance=equipment_item
+            )
         else:
             notes = self.NoteFormSet(instance=equipment_item)
             faults = self.FaultFormSet(instance=equipment_item)
         ctx["notes"] = notes
         ctx["faults"] = faults
         ctx["equipment_name"] = str(equipment_item)
-        
+
         return ctx
 
     def form_valid(self, form):
         context = self.get_context_data()
-        notes = context['notes']
-        faults = context['faults']
+        notes = context["notes"]
+        faults = context["faults"]
         with transaction.atomic():
             self.object = form.save()
             if notes.is_valid():
                 notes.save(self.request.user)
             else:
-                raise ValueError (f""" notes form did not validate:
+                raise ValueError(
+                    f""" notes form did not validate:
 
                 {notes.errors}
-                """)
+                """
+                )
             if faults.is_valid():
                 faults.save(self.request.user)
             else:
-                raise ValueError(f""" faults form did not validate:
-                
+                raise ValueError(
+                    f""" faults form did not validate:
+
                 {faults.errors}
-                """)
-        return super(EquipmentUpdateView,self).form_valid(form)
+                """
+                )
+        return super(EquipmentUpdateView, self).form_valid(form)
+
 
 class EquipmentDeleteView(UbucBaseDeleteView):
     model = Equipment

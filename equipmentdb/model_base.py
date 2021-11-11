@@ -3,10 +3,15 @@ from django.db import models
 from django.urls.base import reverse_lazy
 import re
 
-### abstract base class with common auditing fields
+
+# abstract base class with common auditing fields
 class UbucModel(models.Model):
-    created_on = models.DateTimeField(auto_now_add=True, null=False, editable=False)
-    updated_on = models.DateTimeField(auto_now=True, null=False, editable=False)
+    created_on = models.DateTimeField(
+        auto_now_add=True, null=False, editable=False
+    )
+    updated_on = models.DateTimeField(
+        auto_now=True, null=False, editable=False
+    )
     created_by = models.ForeignKey(
         User,
         null=False,
@@ -27,10 +32,10 @@ class UbucModel(models.Model):
     def get_absolute_url(self):
         return reverse_lazy(f"{classToURL(self.__class__.__name__)}-list")
 
-    def save_with_user(self,user) -> None:
+    def save_with_user(self, user) -> None:
         self.updated_by = user
         if self.created_by_id is None:
-            self.created_by=user
+            self.created_by = user
         return super().save()
 
     class Meta:
@@ -42,7 +47,7 @@ def classToURL(class_name: str) -> str:
     return exp.sub(r"\1-\2", class_name).lower()
 
 
-### Status code enums
+# Status code enums
 class FaultStatus(models.IntegerChoices):
     NEW = 0
     IN_PROGRESS = 1
